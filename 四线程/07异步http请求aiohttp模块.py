@@ -6,6 +6,7 @@
 import aiohttp
 import asyncio
 import os
+import aiofiles
 
 # 实战优美图库
 urls = [
@@ -30,14 +31,14 @@ async def aiodownload(url):
     async with aiohttp.ClientSession() as session:  # 异步的<==> requests模块
         async with session.get(url) as resp:    # 异步的resp
             # 请求回来，写入文件：
-            data = resp.content.read()  # .text=>text() .json()=>.json()
+            data = await resp.content.read()  # .text=>text() .json()=>.json()
             os.listdir("图片")
             # 保存到图片文件夹下
 
             # 文件读写也是io操作，也可以异步操作=> aiofiles模块
 
-            with open("图片/"+name, mode="wb") as f:
-                f.write(await data)  # 读取内容是异步的，需要一个await挂起，什时候有东西在往里面写
+            async with aiofiles.open("图片/"+name, mode="wb") as f:
+                await f.write(data)  # 读取内容是异步的，需要一个await挂起，什时候有东西在往里面写
 
     print(name, "下载成功")
 
